@@ -1,10 +1,10 @@
 {
-  "name": "signinwithweb3",
+  "name": "serverexample",
   "version": "1.0.0",
-  "description": "Sign in using your Web3 credentials",
-  "main": "signinwithweb3.js",
+  "description": "Example app for the Sign in using your Web3 credentials",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ."
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,8 @@
   },
   "homepage": "https://github.com/thedamian/signinwithweb3#readme",
   "dependencies": {
-    "web3": "^1.7.0"
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
+    "path": "^0.12.7"
   }
 }

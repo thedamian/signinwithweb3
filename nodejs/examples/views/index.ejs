@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in with Web3 Example page. </title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.5.4/ethers.umd.min.js" integrity="sha512-xmbPx0riylir51GhTZCFd20yS7NYZNpfDTbEWBjDRzs+UaGb2RyjtASTVtF2ydQWp3xkso9j4sJj39PdSH8/EA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <h1>Sign in with Web3 Example page.</h1>
+    <button onclick="signin()">Sign in with Web3</button><BR>
+    Metamask will come up and ask you to sign a message. No warning should come up. if it does something is wrong.<BR><BR>
+    <button onclick="hitapi()">Hit secure API Once you're authenticated</button>
+<script>
+
+// check if user has metamask installed
+if (!window.ethereum)   alert("No crypto wallet found. Please install metamask. No Eth needed!");
+
+// get message from backend to sign
+var MessageToSign =  "SignInWithWeb3IsAwesome!";
+var signature = ""; // not yet. let's ask for it in the signin
+ fetch("/getMessage").then(res=> res.json()).then(data => { MessageToSign = data })
+
+
+
+async function signin() {
+    const addresses = await window.ethereum.request({method:'eth_requestAccounts'});
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    signature = await signer.signMessage(MessageToSign);
+    let DidWeSignCorrect = await fetch("/checkSignature",{method:"POST",    headers: {'Content-Type': 'application/json'},body:JSON.stringify({signedMessage:signature})}).then(res=> res.json())
+    console.log("DidWeSignCorrect ",DidWeSignCorrect)
+    alert("DidWeSignCorrect " + DidWeSignCorrect)
+}
+
+async function hitapi()  {
+    
+ fetch("/secureAPIEndpoint",{headers: {'Content-Type': 'application/json','authorization':signature}})
+    .then(res=> res.json())
+    .then(DidWeSignCorrect => {
+        console.log("DidWeSignCorrect",DidWeSignCorrect)
+        alert("DidWeSignCorrect" + DidWeSignCorrect)
+    })
+    .catch(ex =>  console.error(ex))
+}
+
+
+</script>
+</body>
+</html>

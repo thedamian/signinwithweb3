@@ -1,51 +1,46 @@
-const EthUtil = require('ethereumjs-util');
-const EthTx = require('ethereumjs-tx');
-//const web3 = require("web3");
+const Web3 = require("web3");
+const web3 = new Web3();
+
 
 // front end would sign the messageToSign (Sent from the backend) with the following code:
 //  await web3.eth.personal.sign(hexMsg, address);
 
 
-exports.module = {
+module.exports =  {
     
     // send this to the client
-    messageToSign: (msg ) => {
-    
+    messageToSign:  (msg ) => {
         // you can choose your own message if you pass the parameter "msg"
         const message =  msg || "SignInWithWeb3IsAwesome!";
-        const hexMsg = convertUtf8ToHex(message); 
+        const hexMsg =  web3.utils.utf8ToHex(message); 
        return hexMsg;
     },
     // Check if the user signed the message successfully.
-    Web3SignedVerify:  () => {
-        const messageToSign = exports.module.messageToSign;
+    GetAddressFromSignature:  async  (signedMessage) => {
+        const messageToSign =  module.exports.messageToSign();
         try {
-            // Create a tx object from signed tx 
-        const tx = new EthTx(web3AuthToken)
-        // return if the message matches
-        return tx.hexMsg == messageToSign
-
+            const address = web3.eth.accounts.recover(messageToSign,signedMessage);
+           console.log("returning a good address",address)
+            return address
         } catch (ex) {
             console.error("Tried to sign and errored: ",ex)
-            return false;
+            return null;
         }
     },
 
     // Middleware for Express. Add this before the REQUEST,RESPONSE parameters in your app.get or app.post etc
     Web3AuthMiddleware: async (req,res,next) => {
-        res.auth.address = "";
+        req.auth  =  {address:""};
         const SignedMessage = req.headers.authorization;
-        if (exports.module.Web3SignedVerify(SignedMessage))
-        {  // Good sign in
-            const tx = new EthTx(SignedMessage)
+        try
+        {  
             // Get an address of sender
-            const address = EthUtil.bufferToHex(tx.getSenderAddress())
-
+            const address =  await module.exports.GetAddressFromSignature(SignedMessage)
             // Add a res.auth object with the address that just connected to us
-            res.auth.address = address; 
+            req.auth.address = address;  // let's set the address so the rest of the system has it for autherization since we're authenticated
             next();
-        } else {
-           console.error("Message didn't match!")
+        } catch (ex) {
+           console.error("Message didn't match!",ex)
            res.status(403).send('Unauthorized');
         }
         return;

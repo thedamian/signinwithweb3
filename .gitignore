@@ -105,3 +105,4 @@ dist
 website/mail.php
 website/mail
 nodejs/package-lock.json
+nodejs/examples/package-lock.json
