@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+website/mail.php
+website/mail
+nodejs/package-lock.json
