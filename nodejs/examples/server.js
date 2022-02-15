@@ -6,7 +6,6 @@ app.use(express.json());
 app.set('view engine', 'ejs'); // I choose you:  ejs
 app.set("views", path.join(__dirname, `/views`)); 
 
-// Just updating my contributions
 
 const signinwithweb3 = require("../signinwithweb3");
 
